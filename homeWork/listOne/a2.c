@@ -7,11 +7,11 @@
 # define BLACK 2
 
 
-# define MAXVERTEX 2001
-# define MAXEDGE 2001
+# define MAXVERTEX 101
+# define MAXEDGE 101
 
 int m, n;
-int time = 0, s = 1, scc = 0;
+int time = 0, s = 1, queue[MAXVERTEX] = {0}, scc = 0, teste = 0;
 
 struct Vertex {
   int color;
@@ -27,18 +27,16 @@ void makeList();
 void printAll();
 void dfs();
 void dfsVisit();
-void verify();
 
 int main() {
 
   scanf("%d %d", &n, &m);
   while(n != 0 && m != 0){
+    teste++;
 
     makeList();
 
     dfs();
-
-    verify();
 
     printAll();
 
@@ -49,7 +47,7 @@ int main() {
 }
 
 void makeList() {
-  int i, j, v, w, p;
+  int i, j, v, w;
 
   for(i = 0; i <= n; i++){
     vertexList[i].color = WHITE;
@@ -59,15 +57,14 @@ void makeList() {
     bzero(vertexList[i].egde, MAXEDGE*(sizeof(int)));
   }
 
-for(i = 0; i < m;i++){
-    scanf("%d %d %d", &v, &w, &p);
+  for(i = 0; i < m;i++){
+    scanf("%d %d", &v, &w);
     
     for(j = 0;vertexList[v].egde[j] != 0;j++);
     vertexList[v].egde[j] = w;
-    if (p == 2) {
-      for(j = 0;vertexList[w].egde[j] != 0;j++);
-      vertexList[w].egde[j] = v;
-    }
+    for(j = 0;vertexList[w].egde[j] != 0;j++);
+    vertexList[w].egde[j] = v;
+    
   }
 }
 
@@ -104,20 +101,13 @@ void dfs(){
   }
 }
 
-void verify(){
-  int i;
-
-  for(i = 1; i <= n;i++){
-    if (vertexList[i].egde[0] == 0) {
-      scc = 2;
-    }
-  }
-}
-
 void printAll(){
 
+  if(teste > 1)
+    printf("\n");
+  printf("Teste %d\n", teste);
   if(scc == 1)
-    printf("1\n");
+    printf("normal\n");
   else
-    printf("0\n");
+    printf("falha\n");
 }
