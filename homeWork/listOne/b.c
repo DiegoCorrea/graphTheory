@@ -11,9 +11,9 @@
 # define MAXEDGE 2001
 
 int m, n;
-int time = 0, s = 1, scc = 0;
+int time = 0, s = 1, scc = 0, scct = 0, finishList[MAXVERTEX], fPosition;
 
-struct Vertex {
+typedef struct Vertex {
   int color;
   int start;
   int finish;
@@ -21,13 +21,14 @@ struct Vertex {
   int egde[MAXEDGE];
 }Vertex;
 
-struct Vertex vertexList[MAXVERTEX];
+struct Vertex vertexList[MAXVERTEX], vertexListTransposed[MAXVERTEX];
 
 void makeList();
 void printAll();
-void dfs();
 void dfsVisit();
-void verify();
+void dfs();
+void dfsVisitTransposed();
+void dfsTransposed();
 
 int main() {
 
@@ -35,10 +36,10 @@ int main() {
   while(n != 0 && m != 0){
 
     makeList();
-
+    
     dfs();
 
-    verify();
+    dfsTransposed();
 
     printAll();
 
@@ -57,9 +58,19 @@ void makeList() {
     vertexList[i].finish = 0;
     vertexList[i].father = 0;
     bzero(vertexList[i].egde, MAXEDGE*(sizeof(int)));
+
+    //Transposed
+    vertexListTransposed[i].color = WHITE;
+    vertexListTransposed[i].start = 0;
+    vertexListTransposed[i].finish = 0;
+    vertexListTransposed[i].father = 0;
+    bzero(vertexListTransposed[i].egde, MAXEDGE*(sizeof(int)));
   }
 
-for(i = 0; i < m;i++){
+  bzero(finishList, MAXVERTEX*(sizeof(int)));
+  fPosition = 0;
+
+  for(i = 0; i < m;i++){
     scanf("%d %d %d", &v, &w, &p);
     
     for(j = 0;vertexList[v].egde[j] != 0;j++);
@@ -67,6 +78,13 @@ for(i = 0; i < m;i++){
     if (p == 2) {
       for(j = 0;vertexList[w].egde[j] != 0;j++);
       vertexList[w].egde[j] = v;
+    }
+    //Transposed
+    for(j = 0;vertexListTransposed[w].egde[j] != 0;j++);
+    vertexListTransposed[w].egde[j] = v;
+    if (p == 2) {
+      for(j = 0;vertexListTransposed[v].egde[j] != 0;j++);
+      vertexListTransposed[v].egde[j] = w;
     }
   }
 }
@@ -89,6 +107,9 @@ void dfsVisit(int u){
   vertexList[u].color = BLACK;
   time++;
   vertexList[u].finish = time;
+
+  fPosition++;
+  finishList[fPosition] = u;
 }
 
 void dfs(){
@@ -104,20 +125,43 @@ void dfs(){
   }
 }
 
-void verify(){
+void dfsVisitTransposed(int u){
+  int v, i;
+  
+  time++;
+  vertexListTransposed[u].start = time;
+  vertexListTransposed[u].color = GRAY;
+
+  for(i = 0;vertexListTransposed[u].egde[i] != 0;i++){
+    v = vertexListTransposed[u].egde[i];
+
+    if(vertexListTransposed[v].color == WHITE){
+      vertexListTransposed[v].father = u;
+      dfsVisitTransposed(v);
+    }
+  }
+  vertexListTransposed[u].color = BLACK;
+  time++;
+  vertexListTransposed[u].finish = time;
+}
+
+void dfsTransposed(){
   int i;
 
-  for(i = 1; i <= n;i++){
-    if (vertexList[i].egde[0] == 0) {
-      scc = 2;
+  scct = 0;
+  time = 0;
+  for(;fPosition > 0;fPosition--){
+    if(vertexListTransposed[finishList[fPosition]].color == WHITE){
+      dfsVisitTransposed(finishList[fPosition]);
+      scct++;
     }
   }
 }
 
 void printAll(){
 
-  if(scc == 1)
-    printf("1\n");
-  else
+  if(scc > 1 || scct > 1)
     printf("0\n");
+  else
+    printf("1\n");
 }

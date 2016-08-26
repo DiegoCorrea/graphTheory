@@ -11,7 +11,7 @@
 # define MAXEDGE 2001
 
 int m, n;
-int time = 0, s = 1, scc = 0, scct = 0;
+int time = 0, s = 1, scc = 0, scct = 0, finishList[MAXVERTEX], fPosition;
 
 typedef struct Vertex {
   int color;
@@ -21,47 +21,30 @@ typedef struct Vertex {
   int egde[MAXEDGE];
 }Vertex;
 
-struct Vertex vertexList[MAXVERTEX], vertexListTransposed[MAXVERTEX], *vertexPoniter[MAXVERTEX];
-
-int partition(int inicio, int final);
-int randomizedPartition(int inicio, int final);
-void quickSort(int inicio, int final);
+struct Vertex vertexList[MAXVERTEX], vertexListTransposed[MAXVERTEX];
 
 void makeList();
 void printAll();
-void dfs();
 void dfsVisit();
-void dfsTransposed();
+void dfs();
 void dfsVisitTransposed();
+void dfsTransposed();
 
 int main() {
-  int i, j;
 
   scanf("%d %d", &n, &m);
   while(n != 0 && m != 0){
-    printf("ini\n");
+
     makeList();
-    printf("fei\n");
+    
     dfs();
 
-    printf("ordi\n");
-    quickSort(1,n);
-
-    printf("quasi\n");
-    //dfsTransposed();
+    dfsTransposed();
 
     printAll();
 
-    for(i = 1; i <= n; i++){
-      printf("%d ", vertexPoniter[i]->finish);
-    }
-    printf("\n");
-    printf("fi\n");
-
     scanf("%d %d", &n, &m);
-    printf("ti\n");
   }
-  printf("si\n");
 
   return 0;
 }
@@ -75,7 +58,6 @@ void makeList() {
     vertexList[i].finish = 0;
     vertexList[i].father = 0;
     bzero(vertexList[i].egde, MAXEDGE*(sizeof(int)));
-    vertexPoniter[i] = &vertexList[i];
 
     //Transposed
     vertexListTransposed[i].color = WHITE;
@@ -83,8 +65,10 @@ void makeList() {
     vertexListTransposed[i].finish = 0;
     vertexListTransposed[i].father = 0;
     bzero(vertexListTransposed[i].egde, MAXEDGE*(sizeof(int)));
-    
   }
+
+  bzero(finishList, MAXVERTEX*(sizeof(int)));
+  fPosition = 0;
 
   for(i = 0; i < m;i++){
     scanf("%d %d %d", &v, &w, &p);
@@ -123,6 +107,9 @@ void dfsVisit(int u){
   vertexList[u].color = BLACK;
   time++;
   vertexList[u].finish = time;
+
+  fPosition++;
+  finishList[fPosition] = u;
 }
 
 void dfs(){
@@ -150,7 +137,7 @@ void dfsVisitTransposed(int u){
 
     if(vertexListTransposed[v].color == WHITE){
       vertexListTransposed[v].father = u;
-      dfsVisit(v);
+      dfsVisitTransposed(v);
     }
   }
   vertexListTransposed[u].color = BLACK;
@@ -163,9 +150,9 @@ void dfsTransposed(){
 
   scct = 0;
   time = 0;
-  for(i = 1; i <= n;i++){
-    if(vertexListTransposed[i].color == WHITE){
-      dfsVisit(i);
+  for(;fPosition > 0;fPosition--){
+    if(vertexListTransposed[finishList[fPosition]].color == WHITE){
+      dfsVisitTransposed(finishList[fPosition]);
       scct++;
     }
   }
@@ -192,56 +179,9 @@ void printAll(){
     printf("\n");
   }
 
+  for(i = 1; i <= n; i++){
+    printf("%d ", finishList[i]);
+  }
+  printf("\n");
   printf("-------------------\n");
-}
-
-int partition(int inicio, int fim) {
-  int direita, esquerda;
-  int pivo;
-  struct Vertex *tmp;
-
-  pivo = vertexPoniter[fim]->finish;
-  direita = fim;
-  esquerda = inicio;
-  printf("z\n");
-  while (esquerda < direita) {
-    printf("aaa%d\n",vertexPoniter[esquerda]->finish);
-    while(vertexPoniter[esquerda]->finish > pivo && esquerda <= fim) { esquerda = esquerda + 1; }
-    printf("l\n");
-    while(vertexPoniter[direita]->finish <= pivo && direita > inicio){ direita = direita - 1; }
-    printf("p\n");
-    if (esquerda < direita){
-      tmp = vertexPoniter[esquerda];
-      vertexPoniter[esquerda] = vertexPoniter[direita];
-      vertexPoniter[direita] = tmp;
-    }
-    printf("fufu\n");
-  }
-  printf("ttt\n");
-  tmp = vertexPoniter[esquerda];
-  printf("a\n");
-  vertexPoniter[esquerda] = vertexPoniter[fim];
-  printf("b\n");
-  vertexPoniter[fim] = tmp;
-  printf("c\n");
-
-  return esquerda;
-}
-int randomizedPartition(int inicio, int final){
-  int i = (rand() % final + inicio);
-  struct Vertex *tmp;
-
-  tmp = vertexPoniter[i];
-  vertexPoniter[i] = vertexPoniter[inicio];
-  vertexPoniter[inicio] = tmp;
-
-  return partition(inicio,final);
-}
-void quickSort(int inicio, int final){
-  int meio;
-  if (inicio < final){
-    meio = randomizedPartition(inicio,final);
-    quickSort(inicio,meio - 1);
-    quickSort(meio + 1,final);
-  }
 }
