@@ -9,7 +9,7 @@
 # define MAXVERTEX 51
 # define MAXEDGE 2501
 
-struct Vertex {
+typedef struct Vertex {
   int color;
   int time;
   int father;
@@ -22,7 +22,7 @@ void makeList();
 void printAll();
 void bfs();
 
-
+  
 int m = 0, n = 0, s = 0, p = 0;
 int queueVertex[MAXVERTEX],teste = 0;
 
@@ -84,7 +84,7 @@ void bfs(){
     for(i = 0;vertexList[u].edge[i] != 0;i++){
       v = vertexList[u].edge[i];
 
-      if(vertexList[v].color == WHITE || vertexList[u].time + 1 < vertexList[v].time){
+      if(vertexList[v].color == WHITE || vertexList[u].time + 1 <= vertexList[v].time){
         vertexList[v].color = GRAY;
         vertexList[v].time = vertexList[u].time + 1;
         vertexList[v].father = u;
@@ -96,7 +96,6 @@ void bfs(){
     vertexList[u].color = BLACK;
   }
 }
-
 
 void printAll(){
   int i, j, count = 0;
