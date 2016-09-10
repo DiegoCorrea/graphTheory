@@ -11,8 +11,8 @@
 
 typedef struct Vertex {
   int color;
-  int time;
-  int father;
+  int countDistance;
+  int edgeCount;
   int edge[MAXEDGE];
 }Vertex;
 
@@ -24,12 +24,12 @@ void bfs();
 
   
 int m = 0, n = 0, s = 0, p = 0;
-int queueVertex[MAXVERTEX],teste = 0;
+int queueVertex[MAXVERTEX], teste = 0;
 
 int main() {
 
   scanf("%d %d %d %d", &n, &m, &s, &p);
-  while(n != 0 && m != 0){
+  while(n != 0){
     teste++;
 
     makeList();
@@ -45,12 +45,12 @@ int main() {
 }
 
 void makeList() {
-  int i, j, v, w;
+  int i, v, w;
 
   for(i = 0; i <= n; i++){
     vertexList[i].color = WHITE;
-    vertexList[i].time = 0;
-    vertexList[i].father = 0;
+    vertexList[i].countDistance = 0;
+    vertexList[i].edgeCount = 0;
     bzero(vertexList[i].edge, MAXEDGE*(sizeof(int)));
     
     bzero(queueVertex, MAXVERTEX*(sizeof(int)));
@@ -58,12 +58,12 @@ void makeList() {
 
   for(i = 0; i < m;i++){
     scanf("%d %d", &v, &w);
-    
-    for(j = 0;vertexList[v].edge[j] != 0 && vertexList[v].edge[j] != w;j++);
-    vertexList[v].edge[j] = w;
 
-    for(j = 0;vertexList[w].edge[j] != 0 && vertexList[w].edge[j] != v;j++);
-    vertexList[w].edge[j] = v;
+    vertexList[v].edge[vertexList[v].edgeCount] = w;
+    vertexList[v].edgeCount++;
+
+    vertexList[w].edge[vertexList[w].edgeCount] = v;
+    vertexList[w].edgeCount++;
   }
 }
 
@@ -71,23 +71,22 @@ void bfs(){
   int i, nq = 0, u, v;
 
   vertexList[s].color = GRAY;
-  vertexList[s].time = 0;
+  vertexList[s].countDistance = 0;
 
   nq++;
   queueVertex[nq] = s;
-  
+
   while(nq != 0){
     u = queueVertex[nq];
     queueVertex[nq] = 0;
     nq--;
 
-    for(i = 0;vertexList[u].edge[i] != 0;i++){
+    for(i = 0;i < vertexList[u].edgeCount;i++){
       v = vertexList[u].edge[i];
 
-      if(vertexList[v].color == WHITE || vertexList[u].time + 1 <= vertexList[v].time){
+      if(vertexList[v].color == WHITE || vertexList[u].countDistance + 1 <= vertexList[v].countDistance){
         vertexList[v].color = GRAY;
-        vertexList[v].time = vertexList[u].time + 1;
-        vertexList[v].father = u;
+        vertexList[v].countDistance = vertexList[u].countDistance + 1;
 
         nq++;
         queueVertex[nq] = v;
@@ -107,7 +106,7 @@ void printAll(){
   bzero(queueVertex, MAXVERTEX*(sizeof(int)));
 
   for(i = 1; i <= n;i++){
-    if(vertexList[i].time <= p && i != s){
+    if(vertexList[i].countDistance <= p && i != s){
       queueVertex[count] = i;
       count++;
     }
