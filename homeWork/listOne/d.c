@@ -97,7 +97,7 @@ void bfs(){
 }
 
 void printAll(){
-  int i, j, count = 0;
+  int i, count = 0;
 
   if(teste > 1)
     printf("\n");
@@ -111,10 +111,13 @@ void printAll(){
       count++;
     }
   }
-  printf("%d", queueVertex[0]);
+  if(count > 0){
+    printf("%d", queueVertex[0]);
 
-  for(i = 1; i < count; i++){
-    printf(" %d", queueVertex[i]);
+    for(i = 1; i < count; i++){
+      printf(" %d", queueVertex[i]);
+    }
   }
+  
   printf("\n");
 }
