@@ -1,9 +1,9 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
+# include <iostream>
+# include <vector>
+# include <algorithm>
 
-#include <string.h>
-#include <stdio.h>
+# include <string.h>
+# include <stdio.h>
 using namespace std;
 
 # define ALONE -1
@@ -32,7 +32,7 @@ class Edge{
     }
 
     bool operator < (const Edge& master) const{
-      return (origin < master.origin);
+      return (distance < master.distance);
     }
 };
 
@@ -53,9 +53,9 @@ class Graph {
     }
 
     int search(int subset[], int edge){
-      printf("local %d\n",subset[edge]);
+      //printf("local %d and edge: %d\n",subset[edge], edge);
       if(subset[edge] == ALONE){
-        printf("alone\n");
+        //printf("alone\n");
         return edge;
       }
       return search(subset, subset[edge]);
@@ -72,20 +72,26 @@ class Graph {
       int size_edges = edges.size();
 
       sort(edges.begin(), edges.end());
+      for (int i = 0; i < size_edges; ++i) {
+        printf("%d ", edges[i].getDistance());
+      }
+      printf("\n");
 
-      int * subset = new int[edges.size()];
+      int * subset = new int[size_edges+1];
 
-      memset(subset, ALONE, sizeof(int) * edges.size());
+      memset(subset, ALONE, sizeof(int) * (size_edges+1));
+      //printf("size of edges: %d\n",size_edges );
 
       for(int i = 0; i < size_edges; i++) {
         int origin = search(subset, edges[i].getOrigin());
         int master = search(subset, edges[i].getMaster());
 
-        printf("%d %d\n", origin, master);
+        //printf("%d %d\n", origin, master);
         if(origin != master) {
-          printf("--%d %d\n", edges[i].getOrigin(), edges[i].getMaster());
+          //printf("--%d --> %d\n", edges[i].getOrigin(), edges[i].getMaster());
           tree.push_back(edges[i]);
           junction(subset, origin, master);
+          //printf("Finish union\n\n");
         }
       }
 
@@ -93,7 +99,7 @@ class Graph {
 
       sort(tree.begin(), tree.end());
 
-      printf("%d\n", size_tree);
+      //printf("%d\n", size_tree);
       for(int i = 0; i < size_tree; i++) {
         printf("%d %d\n", tree[i].getOrigin(), tree[i].getMaster());
       }
@@ -116,9 +122,10 @@ int main(){
       g.addEdge(origin, master, distance);
     }
 
-    //printf("%d\n", test);
+    if(test > 1)
+      printf("\n");
+    printf("Teste %d\n", test);
     g.kruskal();
-    printf("\n");
 
     scanf("%d %d", &n, &m);
   }  
