@@ -14,8 +14,8 @@ class Edge{
   public:
 
     Edge(int v, int w, int distance){
-      origin = v;
-      master = w;
+      this->origin = v;
+      this->master = w;
       this->distance = distance;
     }
 
@@ -32,7 +32,7 @@ class Edge{
     }
 
     bool operator < (const Edge& master) const{
-      return (distance < master.distance);
+      return (origin < master.origin);
     }
 };
 
@@ -52,10 +52,13 @@ class Graph {
       edges.push_back(edge);
     }
 
-    int search(int subset[], int i){
-      if(subset[i] == ALONE)
-        return i;
-      return search(subset, subset[i]);
+    int search(int subset[], int edge){
+      printf("local %d\n",subset[edge]);
+      if(subset[edge] == ALONE){
+        printf("alone\n");
+        return edge;
+      }
+      return search(subset, subset[edge]);
     }
 
     void junction(int subset[], int origin, int master) {
@@ -78,19 +81,22 @@ class Graph {
         int origin = search(subset, edges[i].getOrigin());
         int master = search(subset, edges[i].getMaster());
 
+        printf("%d %d\n", origin, master);
         if(origin != master) {
+          printf("--%d %d\n", edges[i].getOrigin(), edges[i].getMaster());
           tree.push_back(edges[i]);
           junction(subset, origin, master);
         }
       }
 
       int size_tree = tree.size();
-      int result = 0;
 
+      sort(tree.begin(), tree.end());
+
+      printf("%d\n", size_tree);
       for(int i = 0; i < size_tree; i++) {
-        result += tree[i].getDistance();
+        printf("%d %d\n", tree[i].getOrigin(), tree[i].getMaster());
       }
-      printf("%d\n", result);
     }
 };
 
@@ -110,8 +116,11 @@ int main(){
       g.addEdge(origin, master, distance);
     }
 
+    //printf("%d\n", test);
     g.kruskal();
-  
+    printf("\n");
+
     scanf("%d %d", &n, &m);
-  }  return 0;
+  }  
+  return 0;
 }
