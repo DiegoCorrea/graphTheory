@@ -33,11 +33,7 @@ class Edge{
 
     bool operator < (const Edge& master) const{
       return (distance < master.distance);
-<<<<<<< HEAD
-    }    
-=======
     }
->>>>>>> 8772bdb4ac929f89b43d5f2cc3919aaae2af2b11
 };
 
 bool sortOrigin(Edge &origin, Edge &master){

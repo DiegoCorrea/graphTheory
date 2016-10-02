@@ -9,13 +9,15 @@ using namespace std;
 # define ALONE -1
 
 class Edge{
-  double float origin, master;
+  int origin, master;
+  double distance;
 
   public:
 
-    Edge(double float v, double float w){
+    Edge(int v, int w, double distance){
       this->origin = v;
       this->master = w;
+      this->distance = distance;
     }
 
     int getOrigin(){
@@ -24,27 +26,56 @@ class Edge{
 
     int getMaster(){
       return master;
-    }  
+    }
+
+    double getDistance(){
+      return distance;
+    }
+
+    bool operator < (const Edge& master) const{
+      return (distance < master.distance);
+    }
 };
 
-bool sortOrigin(Edge &origin, Edge &master){
-  return (origin.getOrigin() < master.getOrigin());
-}
+class Vertice {
+  double geoCoordinate1, geoCoordinate2;
+
+  public:
+    Vertice(double x1, double x2){
+      this->geoCoordinate1 = x1;
+      this->geoCoordinate2 = x2;
+    }
+
+    double getGeoCoordinate1(){
+      return geoCoordinate1;
+    }
+
+    double getGeoCoordinate2(){
+      return geoCoordinate2;
+    }
+};
 
 class Graph {
   int numberOfVertex;
 
   public:
     vector<Edge> edges;
+    vector<Vertice> vertices;
 
     Graph(int numberOfVertex){
       this->numberOfVertex = numberOfVertex;
       edges.clear();
+      vertices.clear();
     }
 
-    void addEdge(double float origin, double float master) {
-      Edge edge(origin, master);
+    void addEdge(int origin, int master, double distance) {
+      Edge edge(origin, master, distance);
       edges.push_back(edge);
+    }
+
+    void addVertice(double GeoCoordinate1, double GeoCoordinate2) {
+      Vertice vertice(GeoCoordinate1, GeoCoordinate2);
+      vertices.push_back(vertice);
     }
 
     int search(int subset[], int edge){
@@ -54,7 +85,7 @@ class Graph {
       return search(subset, subset[edge]);
     }
 
-    void junction(int subset[], double float origin, double float master) {
+    void junction(int subset[], int origin, int master) {
       int origin_set = search(subset, origin);
       int master_set = search(subset, master);
       subset[origin_set] = master_set;
@@ -65,6 +96,11 @@ class Graph {
       int size_edges = edges.size();
 
       sort(edges.begin(), edges.end());
+      printf("Distancia Ordenada\n");
+      for (int i = 0; i < size_edges; ++i) {
+        printf("%.3f ", edges[i].getDistance());
+      }
+      printf("\n");
 
       int * subset = new int[size_edges+1];
 
@@ -82,9 +118,6 @@ class Graph {
 
       int size_tree = tree.size();
 
-      sort(tree.begin(), tree.end(), sortOrigin);
-
-      //printf("%d\n", size_tree);
       for(int i = 0; i < size_tree; i++) {
         if(tree[i].getOrigin() < tree[i].getMaster())
           printf("%d %d\n", tree[i].getOrigin(), tree[i].getMaster());
@@ -96,17 +129,24 @@ class Graph {
 
 int main(){
   int n;
-  double float origin, master;
+  int origin, master;
+  double distance, x1, x2;
 
   scanf("%d", &n);
 
-  while(n != 0){    
-    test++;
+  while(n != 0){
     Graph g(n);
 
     for(int i = 0; i < n; i++){
-      scanf("%d %d %d", &origin, &master);
-      g.addEdge(origin, master);
+      scanf("%lf %lf", &x1, &x2);
+      g.addVertice(x1,x2);
+    }
+
+    for (int i = 1; i <= n; i++){
+      for (int j = i+1; j <= n; j++){
+        distance = 0.0;
+        g.addEdge(i, j, distance);  
+      }      
     }
 
     g.kruskal();
