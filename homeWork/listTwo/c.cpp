@@ -4,6 +4,7 @@
 
 # include <string.h>
 # include <stdio.h>
+# include <math.h>
 using namespace std;
 
 # define ALONE -1
@@ -38,20 +39,20 @@ class Edge{
 };
 
 class Vertice {
-  double geoCoordinate1, geoCoordinate2;
+  double geoCoordinateX, geoCoordinateY;
 
   public:
-    Vertice(double x1, double x2){
-      this->geoCoordinate1 = x1;
-      this->geoCoordinate2 = x2;
+    Vertice(double x, double y){
+      this->geoCoordinateX = x;
+      this->geoCoordinateY = y;
     }
 
-    double getGeoCoordinate1(){
-      return geoCoordinate1;
+    double getGeoCoordinateX(){
+      return geoCoordinateX;
     }
 
-    double getGeoCoordinate2(){
-      return geoCoordinate2;
+    double getGeoCoordinateY(){
+      return geoCoordinateY;
     }
 };
 
@@ -73,9 +74,20 @@ class Graph {
       edges.push_back(edge);
     }
 
-    void addVertice(double GeoCoordinate1, double GeoCoordinate2) {
-      Vertice vertice(GeoCoordinate1, GeoCoordinate2);
+    void addVertice(double GeoCoordinateX, double GeoCoordinateY) {
+      Vertice vertice(GeoCoordinateX, GeoCoordinateY);
       vertices.push_back(vertice);
+    }
+
+    double calcVerticesDistance(int origin, int master){
+      return sqrt( pow((vertices[origin].getGeoCoordinateX() - vertices[master].getGeoCoordinateX()),2) + pow((vertices[origin].getGeoCoordinateY() - vertices[master].getGeoCoordinateY()),2));
+    }
+
+    void allVertices(){
+      printf("Todos os Vertices\n");
+      for (int i = 0; i < numberOfVertex; ++i) {
+        printf("\t%d: X: %lf Y: %lf \n", i,vertices[i].getGeoCoordinateX(),vertices[i].getGeoCoordinateY());
+      }
     }
 
     int search(int subset[], int edge){
@@ -96,9 +108,10 @@ class Graph {
       int size_edges = edges.size();
 
       sort(edges.begin(), edges.end());
-      printf("Distancia Ordenada\n");
+
+      printf("Todas as Arestas\n");
       for (int i = 0; i < size_edges; ++i) {
-        printf("%.3f ", edges[i].getDistance());
+        printf("\t%d %d : %.4lf\n", edges[i].getOrigin(), edges[i].getMaster(), edges[i].getDistance());
       }
       printf("\n");
 
@@ -117,39 +130,42 @@ class Graph {
       }
 
       int size_tree = tree.size();
-
+      double result = 0.0;
+      printf("Arestas da Arvore:\n");
       for(int i = 0; i < size_tree; i++) {
-        if(tree[i].getOrigin() < tree[i].getMaster())
-          printf("%d %d\n", tree[i].getOrigin(), tree[i].getMaster());
-        else
-          printf("%d %d\n", tree[i].getMaster(), tree[i].getOrigin());
+        if(tree[i].getDistance() > result)
+          result = tree[i].getDistance();
       }
+      printf("%.4lf\n", result);
     }
 };
 
 int main(){
   int n;
   int origin, master;
-  double distance, x1, x2;
+  double distance, x, y;
 
   scanf("%d", &n);
 
   while(n != 0){
     Graph g(n);
-
+    
     for(int i = 0; i < n; i++){
-      scanf("%lf %lf", &x1, &x2);
-      g.addVertice(x1,x2);
+      scanf("%lf %lf", &x, &y);
+      g.addVertice(x,y);
     }
-
-    for (int i = 1; i <= n; i++){
-      for (int j = i+1; j <= n; j++){
-        distance = 0.0;
-        g.addEdge(i, j, distance);  
-      }      
-    }
-
-    g.kruskal();
+    if(n > 1){
+      g.allVertices();
+  
+      for (int i = 0; i < n; i++){
+        for (int j = i+1; j < n; j++){
+          distance = g.calcVerticesDistance(i,j);
+          g.addEdge(i, j, distance);  
+        }      
+      }
+  
+      g.kruskal();
+    }else{ printf("0.0000\n"); }
 
     scanf("%d", &n);
   }  
