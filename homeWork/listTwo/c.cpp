@@ -109,12 +109,13 @@ class Graph {
 
       sort(edges.begin(), edges.end());
 
+      /*
       printf("Todas as Arestas\n");
       for (int i = 0; i < size_edges; ++i) {
         printf("\t%d %d : %.4lf\n", edges[i].getOrigin(), edges[i].getMaster(), edges[i].getDistance());
       }
       printf("\n");
-
+      */
       int * subset = new int[size_edges+1];
 
       memset(subset, ALONE, sizeof(int) * (size_edges+1));
@@ -131,7 +132,7 @@ class Graph {
 
       int size_tree = tree.size();
       double result = 0.0;
-      printf("Arestas da Arvore:\n");
+      //printf("Arestas da Arvore:\n");
       for(int i = 0; i < size_tree; i++) {
         if(tree[i].getDistance() > result)
           result = tree[i].getDistance();
@@ -155,7 +156,7 @@ int main(){
       g.addVertice(x,y);
     }
     if(n > 1){
-      g.allVertices();
+      //g.allVertices();
   
       for (int i = 0; i < n; i++){
         for (int j = i+1; j < n; j++){
