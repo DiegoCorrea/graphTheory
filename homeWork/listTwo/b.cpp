@@ -33,7 +33,11 @@ class Edge{
 
     bool operator < (const Edge& master) const{
       return (distance < master.distance);
+<<<<<<< HEAD
     }    
+=======
+    }
+>>>>>>> 8772bdb4ac929f89b43d5f2cc3919aaae2af2b11
 };
 
 bool sortOrigin(Edge &origin, Edge &master){
@@ -76,6 +80,10 @@ class Graph {
       int size_edges = edges.size();
 
       sort(edges.begin(), edges.end());
+      for (int i = 0; i < size_edges; ++i) {
+        printf("%d ", edges[i].getDistance());
+      }
+      printf("\n");
 
       int * subset = new int[size_edges+1];
 
