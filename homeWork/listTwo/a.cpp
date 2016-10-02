@@ -69,9 +69,9 @@ class Graph {
 
       sort(edges.begin(), edges.end());
 
-      int * subset = new int[edges.size()];
+      int * subset = new int[edges.size()+1];
 
-      memset(subset, ALONE, sizeof(int) * edges.size());
+      memset(subset, ALONE, sizeof(int) * (edges.size()+1));
 
       for(int i = 0; i < size_edges; i++) {
         int origin = search(subset, edges[i].getOrigin());
