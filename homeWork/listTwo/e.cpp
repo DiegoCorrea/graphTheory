@@ -131,6 +131,13 @@ class Graph {
       }
     }
 
+    int getEdgeOnTree(int edge){
+      for (int i = 0; i < edges.size(); ++i) {
+        if ((edges[i].getOrigin() == tree[edge].getOrigin()) && (edges[i].getMaster() == tree[edge].getMaster())){
+          return i;
+        }
+      }
+    }
     void removeEdge(int edgeToRemove){
       edges.erase(edges.begin() + edgeToRemove);
     }
@@ -161,7 +168,7 @@ int main(){
       for(int edgeTree = 0; edgeTree < g.getNumberOfEdgesOnTree();edgeTree++){
         Graph tryNewWay = g;
         
-        tryNewWay.removeEdge(edgeTree);
+        tryNewWay.removeEdge(g.getEdgeOnTree(edgeTree));
         tryNewWay.kruskal();
         if(tryNewWay.haveMST()){
           g.addNewWayValor(tryNewWay.getResult());
