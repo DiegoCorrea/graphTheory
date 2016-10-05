@@ -44,14 +44,9 @@ class Graph {
       edges.push_back(edge);
     }
 
-    void addEdgeOnCircuit(Edge edgeToCompare, int compare){
-      if(edgeToCompare.getMaster() == compare){
-        Edge edge(edgeToCompare.getMaster(), edgeToCompare.getOrigin());
-        circuit.push_back(edge); 
-      } else{
-        Edge edge(edgeToCompare.getOrigin(), edgeToCompare.getMaster());
-        circuit.push_back(edge); 
-      }
+    void addEdgeOnCircuit(int origin, int master){
+      Edge edge(origin, master);
+      circuit.push_back(edge);
     }
 
     int getNumberOfVertex(){
@@ -59,8 +54,10 @@ class Graph {
     }
 
     int searchEdge(int vertex){
+      printf("Search: %d\n", vertex);
       for(int i = 0; i < edges.size();i++){
         if(edges[i].getOrigin() == vertex || edges[i].getMaster() == vertex){
+          printf("Found: %d %d",edges[i].getOrigin(), edges[i].getMaster());
           return i;
         }
       }
@@ -71,31 +68,47 @@ class Graph {
       edges.erase(edges.begin() + edgeToRemove);
     }
 
+    Edge copyInOrder(int local, int toCompare){
+      if(edges[local].getMaster() == toCompare){
+        Edge edge(edges[local].getMaster(), edges[local].getOrigin());
+        return edge;
+      } else{
+        Edge edge(edges[local].getOrigin(), edges[local].getMaster());
+        return edge;
+      }
+    }
+
     bool necklace(){
       int start;
       Edge walker = edges[0];
-      removeEdge(0);
+      printf("Add to Circuit: Origin: %d Master: %d\n",edges[0].getOrigin(), edges[0].getMaster());
       circuit.push_back(walker);
       start = walker.getOrigin();
+      printf("Remove from Edges: Origin: %d Master: %d\n",walker.getOrigin(), walker.getMaster());
+      removeEdge(0);
 
-      for(int i = 1, local; i < edges.size();i++){        
+      for(int i = 1, size_edges = edges.size()+1, local; i < size_edges;i++){        
         local = searchEdge(walker.getMaster());
+        printf(" on Local: %d\n", local);
         if(local == -1) return false;
 
-        addEdgeOnCircuit(edges[local],walker.getMaster());
+        walker = copyInOrder(local, walker.getMaster());
 
-        walker = edges[local];
-        
-        removeEdge(local);       
+        printf("Add to Circuit: Origin: %d Master: %d\n",walker.getOrigin(), walker.getMaster());
+        addEdgeOnCircuit(walker.getOrigin(),walker.getMaster());
+
+        //walker = edges[local];
+        printf("Remove from Edges: Origin: %d Master: %d from Local: %d\n",edges[local].getOrigin(), edges[local].getMaster(), local);
+        removeEdge(local);
+        printf("\n");
       }
-      /*
-      int finish = walker.getMaster();
-      if(start == finish){
+
+      if(start == walker.getMaster()){
         return true;
       } else {
         return false;
       }
-      */
+      
     }
 
     void printCircuit(){
