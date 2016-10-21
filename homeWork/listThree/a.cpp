@@ -85,11 +85,11 @@ class Graph {
     int start;
     int finish;
     vector<Vertex> vertexVector;
-    vector<Vertex> vertexQueue;
+    vector<int> priorityQueue;
 
     Graph(int numberOfVertex){
       vertexVector.clear();
-      vertexQueue.clear();
+      priorityQueue.clear();
       this->numberOfVertex = numberOfVertex;
     }
 
@@ -124,15 +124,15 @@ class Graph {
       }
     }
 
-    Vertex extractMin(){
-      int queueSize = vertexQueue.size();
-      Vertex walker = vertexQueue.front();
-      Vertex min = vertexQueue.front();
+    int extractMin(){
+      int queueSize = priorityQueue.size();
+      Vertex walker = vertexVector[priorityQueue.front()];
+      Vertex min = vertexVector[priorityQueue.front()];
       int eraseVertex = 0;
 
       //printf("ee\n");
       for(int i = 0; i < queueSize ; i++){
-        walker = vertexQueue[i];
+        walker = vertexVector[priorityQueue[i]];
         //printf("fff\n");
         if(min.getVisitedTime() > walker.getVisitedTime()){
           Vertex min = walker;
@@ -140,33 +140,34 @@ class Graph {
         }
       }
       //printf("dededede\n");
-      vertexQueue.erase(vertexQueue.begin() + eraseVertex);
-      return min;
+      priorityQueue.erase(priorityQueue.begin() + eraseVertex);
+      return min.getId();
     }
 
-    void relax(Vertex origin, int positionVertexToRelax){
-      if(origin.getVisitedTime() + origin.getEdgeDistance(positionVertexToRelax) < vertexVector[positionVertexToRelax].getVisitedTime()){
-        vertexVector[positionVertexToRelax].setVisitedTime(origin.getVisitedTime() + origin.getEdgeDistance(positionVertexToRelax));
-        vertexVector[positionVertexToRelax].setFather(origin.getId());
+    void relax(int origin, int master, int positionMasterToRelax){
+      if(vertexVector[origin].getVisitedTime() + vertexVector[origin].getEdgeDistance(positionMasterToRelax) < vertexVector[master].getVisitedTime()){
+        vertexVector[master].setVisitedTime(vertexVector[origin].getVisitedTime() + vertexVector[origin].getEdgeDistance(positionMasterToRelax));
+        vertexVector[master].setFather(vertexVector[origin].getId());
       }
     }
 
     void dijkstra(){
       vertexVector[this->start].setVisitedTime(0);
-      vector<Vertex> solution;
-      vertexQueue = vertexVector;
-      //printf("dd\n");
+      vector<int> solution;
+      for(int i = 1; i <= vertexVector.size();i++) {priorityQueue.push_back(i);}
+      
+      while(!priorityQueue.empty()){
+        int walker = extractMin();
+        printf("Extract Min: id: %d distance: %d\n", vertexVector[walker].getId(), vertexVector[walker].getVisitedTime());
 
-      Vertex walker = vertexVector[this->start];
-      //printf("gg\n");
-      while(!vertexQueue.empty()){
-        Vertex walker = extractMin();
-        printf("Extract Min: id: %d distance: %d\n", walker.getId(), walker.getVisitedTime());
-
-        for(int i = 0; i < walker.getGrau();i++){
-          relax(walker,i);
+        for(int i = 0; i < vertexVector[walker].getGrau();i++){
+          relax(vertexVector[walker].getId(),vertexVector[walker].getEdgeMaster(i), i);
         }
         solution.push_back(walker);
+      }
+
+      for (int i = 0; i < vertexVector.size(); ++i){
+        printf("id: %d Visited time: %d\n", vertexVector[i].getId(), vertexVector[i].getVisitedTime());
       }
     }
 };
@@ -192,8 +193,6 @@ int main(){
     g.printAllGraph();
 
     g.dijkstra();
-
-    g.printAllGraph();
 
     scanf("%d %d", &n, &m);
   }
