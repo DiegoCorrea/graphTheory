@@ -52,6 +52,7 @@ class Graph {
     int getNumberOfVertex(){
       return this->numberOfVertex;
     }
+
     int getEdgesSize(){
       return edges.size();
     }
@@ -99,7 +100,6 @@ class Graph {
         //printf("Add to Circuit: Origin: %d Master: %d\n",walker.getOrigin(), walker.getMaster());
         addEdgeOnCircuit(walker.getOrigin(),walker.getMaster());
 
-        //walker = edges[local];
         //printf("Remove from Edges: Origin: %d Master: %d from Local: %d\n",edges[local].getOrigin(), edges[local].getMaster(), local);
         removeEdge(local);
         //printf("\n");
