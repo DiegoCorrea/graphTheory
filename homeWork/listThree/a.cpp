@@ -5,8 +5,8 @@
 # include <stdio.h>
 using namespace std;
 
-# define INITIALVERTEX 1
-# define INFINITE 99999999
+# define MAXVERTEX 101
+# define INFINITE 99999
 
 class Edge{
   int master, distance;
@@ -28,13 +28,14 @@ class Edge{
 };
 
 class Vertex{
+  int father, visitedTime, id;
+  vector<Edge> edges;
 
-  public: 
-    int father, visitedTime, id;
-    vector<Edge> edges;
+  public:     
+
     Vertex(int i){
       this->visitedTime = INFINITE;
-      this-> father = INFINITE;
+      this->father = INFINITE;
       this->id = i;
     }
 
@@ -79,18 +80,18 @@ class Vertex{
 };
 
 class Graph {
+  int numberOfVertex;
+  int start;
+  int finish;
+  vector<Vertex> vertexVector;
+  vector<int> priorityQueue;
 
   public:
-    int numberOfVertex;
-    int start;
-    int finish;
-    vector<Vertex> vertexVector;
-    vector<int> priorityQueue;
-
+    
     Graph(int numberOfVertex){
+      this->numberOfVertex = numberOfVertex;
       vertexVector.clear();
       priorityQueue.clear();
-      this->numberOfVertex = numberOfVertex;
     }
 
     void addVertex(int origin, int master, int distance){
@@ -104,18 +105,15 @@ class Graph {
 
     void initialize(){
       //Initialize single source
-      for(int i = 0; i <= this->numberOfVertex; i++){
-        
-        Vertex v(i);
-        
+      for(int i = 0; i <= MAXVERTEX; i++){
+        Vertex v(i);        
         vertexVector.push_back(v);
-        //printf("Add Vertex: id: %d father: %d distance: %d\n", vertexVector[i].getId(), vertexVector[i].getFather(), vertexVector[i].getVisitedTime());
       }
     }
 
     void printAllGraph(){
-      printf("start: %d finish: %d\n", this->start, this-> finish);
-      for(int i = 0; i < vertexVector.size();i++){
+      printf("start: %d finish: %d\n", this->start, this->finish);
+      for(int i = 0; i <= this->numberOfVertex;i++){
         printf("id: %d\n", vertexVector[i].getId());
         printf("Father: %d Visited Time: %d \n", vertexVector[i].getFather(), vertexVector[i].getVisitedTime());
         for(int j = 0; j < vertexVector[i].getGrau();j++){
@@ -134,8 +132,8 @@ class Graph {
       for(int i = 0; i < queueSize ; i++){
         walker = vertexVector[priorityQueue[i]];
         //printf("fff\n");
-        if(min.getVisitedTime() > walker.getVisitedTime()){
-          Vertex min = walker;
+        if(walker.getVisitedTime() <= min.getVisitedTime() ){
+          min = walker;
           eraseVertex = i;
         }
       }
@@ -154,47 +152,61 @@ class Graph {
     void dijkstra(){
       vertexVector[this->start].setVisitedTime(0);
       vector<int> solution;
-      for(int i = 1; i <= vertexVector.size();i++) {priorityQueue.push_back(i);}
+      for(int i = 0; i <= this->numberOfVertex;i++) {priorityQueue.push_back(i);}
       
       while(!priorityQueue.empty()){
         int walker = extractMin();
-        printf("Extract Min: id: %d distance: %d\n", vertexVector[walker].getId(), vertexVector[walker].getVisitedTime());
+        //printf("Extract Min: id: %d distance: %d\n", vertexVector[walker].getId(), vertexVector[walker].getVisitedTime());
 
         for(int i = 0; i < vertexVector[walker].getGrau();i++){
           relax(vertexVector[walker].getId(),vertexVector[walker].getEdgeMaster(i), i);
         }
         solution.push_back(walker);
       }
-
-      for (int i = 0; i < vertexVector.size(); ++i){
+      /*
+      for (int i = 0; i <= this->numberOfVertex; ++i){
         printf("id: %d Visited time: %d\n", vertexVector[i].getId(), vertexVector[i].getVisitedTime());
+      }
+      */
+    }
+
+    void result(){
+      if(vertexVector[this->finish].getVisitedTime() != INFINITE){
+        printf("%d\n", vertexVector[this->finish].getVisitedTime());
+      } else{
+        printf("-1\n");
       }
     }
 };
 
 int main(){
-  int n, m;
+  int n = 1, m = 1;
   int origin, master, distance;
 
+  scanf("%d %d", &n, &m);
+
   while(n != 0){
-    scanf("%d %d", &n, &m);
 
     Graph g(n);
     g.initialize();
 
     for(int i = 0; i < m; i++){
-      scanf("%d %d %d", &origin, &master, &distance);
+      scanf(" %d %d %d", &origin, &master, &distance);
       g.addVertex(origin, master, distance);
+      //printf("==origin %d master %d distance: %d\n", origin,master,distance);
     }
 
     scanf("%d %d", &origin, &master);
+    //printf("origin %d master %d\n", origin,master);
     g.startAndFinish(origin, master);
 
-    g.printAllGraph();
+    //g.printAllGraph();
 
     g.dijkstra();
-
+    g.result();
+    //printf("====================\t=======================\n");
     scanf("%d %d", &n, &m);
+    //printf("vertex: %d edges: %d\n", n,m);
   }
 
   return 0;
