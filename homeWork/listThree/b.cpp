@@ -28,7 +28,7 @@ class Edge{
 };
 
 class Vertex{
-  int father, visitedTime, id;
+  int father, visitedTime, id, sonDistance;
   vector<Edge> edges;
 
   public:     
@@ -37,6 +37,7 @@ class Vertex{
       this->visitedTime = INFINITE;
       this->father = INFINITE;
       this->id = i;
+      this->sonDistance = 0;
     }
 
     void addEdge(int master, int distance) {
@@ -53,6 +54,13 @@ class Vertex{
 
     int getId(){
       return this->id;
+    }
+    int getSonDistance(){
+      return this->sonDistance;
+    }
+
+    void setSonDistance(int value){
+      this->sonDistance = value;
     }
 
     void setVisitedTime(int dis){
@@ -76,6 +84,14 @@ class Vertex{
 
     int getEdgeDistance(int position){
       return edges[position].getDistance();
+    }
+
+    int searchEdgeDistance(int master){
+      for(int i = 0; i < edges.size();i++){
+        if(edges[i].getMaster() == master)
+          return edges[i].getDistance();
+      }
+      return 0;
     }
 };
 
@@ -143,47 +159,56 @@ class Graph {
 
     void dijkstra(){
       vertexVector[this->start].setVisitedTime(0);
-      //vector<int> solution;
-      bool outRoute = true;
-
+      vector<int> solution;
+      int walker;
+      
       for(int i = 0; i <= this->numberOfVertex;i++) {priorityQueue.push_back(i);}
       
       while(!priorityQueue.empty()){
-        int walker;
-        if(outRoute){
-          walker = extractMin();
+        walker = extractMin();
+
+        //printf("Extract Min: id: %d distance: %d\n", vertexVector[walker].getId(), vertexVector[walker].getVisitedTime());
+
+        if(walker < this->finish && (vertexVector[walker].getSonDistance() + vertexVector[walker].getVisitedTime() < vertexVector[this->finish].getVisitedTime())){
+          vertexVector[this->finish].setVisitedTime(vertexVector[walker].getSonDistance() + vertexVector[walker].getVisitedTime());
         }
-        if(walker <= this->finish && outRoute){
-          outRoute = false;
-          priorityQueue.clear();
-          for(int i = walker; i < this->finish;i++) {priorityQueue.push_back(i);}
+        if(walker < this->finish)
+           break;
+
+        for(int i = 0; i < vertexVector[walker].getGrau();i++){
+          relax(vertexVector[walker].getId(),vertexVector[walker].getEdgeMaster(i), i);
         }
-        if(!outRoute && !priorityQueue.empty()){
-          walker = extractRoute();
-        }
-        if(outRoute){
-          for(int i = 0; i < vertexVector[walker].getGrau();i++){
-            relax(vertexVector[walker].getId(),vertexVector[walker].getEdgeMaster(i), i);
-            //printf("Relando: origin: %d master: %d distance: %d\n", vertexVector[walker].getId(),vertexVector[walker].getEdgeMaster(i),vertexVector[walker].getEdgeDistance(i));
-          }
-        }
-        if(!outRoute){
-          for(int i = 0; i < vertexVector[walker].getGrau(); i++){
-            if(vertexVector[walker].getId() < vertexVector[walker].getEdgeMaster(i) && (priorityQueue.empty() || vertexVector[walker].getEdgeMaster(i) < this->finish)){
-              relax(vertexVector[walker].getId(),vertexVector[walker].getEdgeMaster(i), i);
-              //printf("Relando: origin: %d master: %d distance: %d\n", vertexVector[walker].getId(),vertexVector[walker].getEdgeMaster(i),vertexVector[walker].getEdgeDistance(i));
-            }
-          }
-        }
-        //solution.push_back(walker);
+        solution.push_back(walker);
+      }
+
+      /*
+      for (int i = 0; i <= this->numberOfVertex; ++i){
+        printf("id: %d Visited time: %d\n", vertexVector[i].getId(), vertexVector[i].getVisitedTime());
+      }
+      */
+    }
+
+    void calcFather(){
+      vertexVector[this->finish].setSonDistance(0);
+      for(int son = this->finish, father = son - 1; father >= 0;son--, father--){
+        vertexVector[father].setSonDistance(vertexVector[son].getSonDistance() + vertexVector[son].searchEdgeDistance(father));
       }
     }
 
     void result(){
       if(vertexVector[this->finish].getVisitedTime() != INFINITE){
         printf("%d\n", vertexVector[this->finish].getVisitedTime());
-      } else{
-        printf("-1\n");
+      }
+    }
+
+    void printAllGraph(){
+      printf("start: %d finish: %d\n", this->start, this->finish);
+      for(int i = 0; i <= this->numberOfVertex;i++){
+        printf("id: %d\n", vertexVector[i].getId());
+        printf("Father: %d Visited Time: %d Son Distance: %d\n", vertexVector[i].getFather(), vertexVector[i].getVisitedTime(), vertexVector[i].getSonDistance());
+        for(int j = 0; j < vertexVector[i].getGrau();j++){
+          printf("\tmaster: %d distance: %d\n", vertexVector[i].getEdgeMaster(j),vertexVector[i].getEdgeDistance(j));
+        }
       }
     }
 };
@@ -207,11 +232,10 @@ int main(){
     g.startAndFinish(k, c-1);
 
     g.calcFather();
-
+    //g.printAllGraph();
     g.dijkstra();
     g.result();
     scanf("%d %d %d %d", &n, &m, &c, &k);
   }
-
   return 0;
 }
