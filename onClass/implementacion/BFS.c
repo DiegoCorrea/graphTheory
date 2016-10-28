@@ -21,7 +21,6 @@ struct Vertex vertexList[MAXVERTEX];
 void makeList();
 void printAll();
 void bfs();
-void verify();
 
 
 int m = 0, n = 0, s = 1;
@@ -36,8 +35,6 @@ int main() {
     makeList();
     
     bfs();
-
-    verify();
 
     printAll();
 
@@ -97,21 +94,14 @@ void bfs(){
   }
 }
 
-void verify(){
-  int i;
-  for(i = 1; i <= n;i++){
-    if(vertexList[i].color != BLACK)
-      isDown = 1;
-  }
-}
-
 void printAll(){
-
-  if(teste > 1)
+  int i, j;
+  for(i = 1; i <= n;i++){
+    printf("ID: %d | Color: %d\n Time: %d | Father: %d\n", i,vertexList[i].color,vertexList[i].time ,vertexList[i].father);
+    for(j = 0; vertexList[i].edge[j] != 0;j++){
+      printf("\tEdge %d|", vertexList[i].edge[j]);
+    }
     printf("\n");
-  printf("Teste %d\n", teste);
-  if(isDown == 0)
-    printf("normal\n");
-  else
-    printf("falha\n");
+  }
+  printf("-------------------\n");
 }
